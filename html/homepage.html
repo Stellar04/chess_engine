@@ -1,35 +1,45 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Chessboard</title>
+    <link rel="icon" href="assets/w_pawn.png" type="image/png">
+    <title>Chess</title>
     <meta charset="UTF-8">
     <style>
-      .chess-board {
-        border-spacing: 0;
-        border-collapse: collapse;
+      body {
+        font-family: Arial, sans-serif;
+        color: white;
+        background-color: rgb(53, 53, 53);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* This makes sure the body takes the full viewport height */
+        margin: 0; /* This removes any default margin */
       }
+
       .chess-board th {
         padding: .5em;
       }
       .chess-board td {
-        border: 1px solid;
-        width: 2em;
-        height: 2em;
+        width: 3em;
+        height: 3em;
       }
       .chess-board .light {
-        background: #eee;
+        background: #feffdf;
       }
       .chess-board .dark {
-        background: #000;
+        background: #562700;
       }
       .chess-board .piece {
         background-size: contain;
         background-repeat: no-repeat;
       }
+
+      .chess-board:hover {
+        cursor: grab;
+      }
+
       .chess-board .w_king {
         background-image: url("assets/w_king.png");
-        width: 100%;
-        height: 100%;
       }
       .chess-board .w_queen {
         background-image: url("assets/w_queen.png");
@@ -69,73 +79,146 @@
   <body>
     <table class="chess-board">
       <tbody>
-        <tr>
-          <th></th>
-          <th>a</th>
-          <th>b</th>
-          <th>c</th>
-          <th>d</th>
-          <th>e</th>
-          <th>f</th>
-          <th>g</th>
-          <th>h</th>
-        </tr>
-        <tr>
-          <th>8</th>
-          <td class="light b_rook"></td>
-          <td class="dark b_knight"></td>
-          <td class="light b_bishop"></td>
-          <td class="dark b_queen"></td>
-          <td class="light b_king"></td>
-          <td class="dark b_bishop"></td>
-          <td class="light b_knight"></td>
-          <td class="dark b_rook"></td>
-        </tr>
-        <tr>
-          <th>7</th>
-          <td class="dark b_pawn"></td>
-          <td class="light b_pawn"></td>
-          <td class="dark b_pawn"></td>
-          <td class="light b_pawn"></td>
-          <td class="dark b_pawn"></td>
-          <td class="light b_pawn"></td>
-          <td class="dark b_pawn"></td>
-          <td class="light b_pawn"></td>
-        </tr>
-        <tr>
-          <th>6</th>
-          <td class="light"></td>
-          <td class="dark"></td>
-          <td class="light"></td>
-          <td class="dark"></td>
-          <td class="light"></td>
-          <td class="dark"></td>
-          <td class="light"></td>
-          <td class="dark"></td>
-        </tr>
-        <tr>
-          <th>5</th>
-          <td class="dark"></td>
-          <td class="light"></td>
-          <td class="dark"></td>
-          <td class="light"></td>
-          <td class="dark"></td>
-          <td class="light"></td>
-          <td class="dark"></td>
-          <td class="light"></td>
-        </tr>
-        <tr>
-          <th>4</th>
-          <td class="dark"></td>
-          <td class="light"></td>
-          <td class="dark"></td>
-          <td class="light"></td>
-          <td class="dark"></td>
-          <td class="light"></td>
-          <td class="dark"></td>
-          <td class="light"></td>
-        </tr> 
       </tbody>
     </table>
   </body>
+  <script>
+    // Define the positions and pieces
+    var positions = {
+      'a1': 'w_rook',
+      'b1': 'w_knight',
+      'c1': 'w_bishop',
+      'd1': 'w_queen',
+      'e1': 'w_king',
+      'f1': 'w_bishop',
+      'g1': 'w_knight',
+      'h1': 'w_rook',
+      'a2': 'w_pawn',
+      'b2': 'w_pawn',
+      'c2': 'w_pawn',
+      'd2': 'w_pawn',
+      'e2': 'w_pawn',
+      'f2': 'w_pawn',
+      'g2': 'w_pawn',
+      'h2': 'w_pawn',
+      'a7': 'b_pawn',
+      'b7': 'b_pawn',
+      'c7': 'b_pawn',
+      'd7': 'b_pawn',
+      'e7': 'b_pawn',
+      'f7': 'b_pawn',
+      'g7': 'b_pawn',
+      'h7': 'b_pawn',
+      'a8': 'b_rook',
+      'b8': 'b_knight',
+      'c8': 'b_bishop',
+      'd8': 'b_queen',
+      'e8': 'b_king',
+      'f8': 'b_bishop',
+      'g8': 'b_knight',
+      'h8': 'b_rook',
+    };
+
+    // Function to generate HTML for a cell
+    function generateCell(position, piece) {
+      var column = position.charAt(0);
+      var row = position.charAt(1);
+      var color = (column.charCodeAt(0) - 'a'.charCodeAt(0) + parseInt(row)) % 2 === 0 ? 'light' : 'dark';
+      return '<td class="' + color + ' ' + (piece || '') + ' piece" draggable="true" ondragstart="dragStart(event, \'' + position + '\')" ondragover="dragOver(event)" ondrop="drop(event, \'' + position + '\')"></td>';
+    }
+
+    // Function to handle drag start
+    function dragStart(event, position) {
+      event.dataTransfer.setData('text/plain', position);
+      
+      var img = new Image();
+      img.src = 'assets/' + positions[position] + '.png';
+      event.dataTransfer.setDragImage(img, img.width / 2, img.height / 2);
+      
+      event.target.style.opacity = '1'; // Change the opacity
+    }
+
+    // Function to handle drag end
+    function dragEnd(event) {
+      event.target.style.opacity = ''; // Reset the opacity
+    }
+
+    // Function to handle drag over
+    function dragOver(event) {
+      event.preventDefault();
+    }
+
+    // Function to validate pawn's move
+    function validatePawnMove(oldPosition, newPosition, piece) {
+      var oldRow = parseInt(oldPosition.charAt(1));
+      var newRow = parseInt(newPosition.charAt(1));
+      var oldColumn = oldPosition.charAt(0);
+      var newColumn = newPosition.charAt(0);
+
+      // Check if the piece is a pawn
+      if (piece.includes('pawn')) {
+        // Pawns can only move forward
+        if (oldColumn !== newColumn) {
+          return false;
+        }
+
+        // White pawns move up, black pawns move down
+        var direction = piece.startsWith('w') ? 1 : -1;
+
+        // Pawns can move 2 spaces from their initial position, 1 space otherwise
+        var maxMove = oldRow === (piece.startsWith('w') ? 2 : 7) ? 2 : 1;
+
+        // Check if the move is valid
+        if (Math.abs(newRow - oldRow) > maxMove || Math.abs(newRow - oldRow) < 1) {
+          return false;
+        }
+
+        // Check if there is a piece in the new position
+        if (positions[newPosition]) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    // Modify the drop function
+    function drop(event, newPosition) {
+      event.preventDefault();
+      var oldPosition = event.dataTransfer.getData('text/plain');
+      var piece = positions[oldPosition];
+
+      // Validate the move
+      if (!validatePawnMove(oldPosition, newPosition, piece)) {
+        return;
+      }
+
+      delete positions[oldPosition];
+      positions[newPosition] = piece;
+      generateBoard();
+    }
+
+    // Function to generate the board
+    function generateBoard() {
+      // Generate the HTML for the chessboard
+      var chessboardHTML = '';
+      for (var i = 8; i >= 1; i--) { // Start from 8 and go down to 1
+        chessboardHTML += '<tr><th>' + i + '</th>'; // Open the row and add the row header
+        for (var j = 0; j < 8; j++) {
+          var position = String.fromCharCode('a'.charCodeAt(0) + j) + i;
+          chessboardHTML += generateCell(position, positions[position]);
+        }
+        chessboardHTML += '</tr>'; // Close the row
+      }
+
+      // Add the column headers
+      chessboardHTML = '<tr><th></th><th>a</th><th>b</th><th>c</th><th>d</th><th>e</th><th>f</th><th>g</th><th>h</th></tr>' + chessboardHTML;
+
+      // Insert the HTML into the chessboard table
+      document.querySelector('.chess-board tbody').innerHTML = chessboardHTML;
+    }
+
+    // Call the generateBoard function to initially generate the board
+    generateBoard();
+  </script>
 </html>
