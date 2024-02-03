@@ -16,12 +16,22 @@
         margin: 0; /* This removes any default margin */
       }
 
+      .indicator {
+        background-color: rgba(106, 106, 106, 0.5);
+        border-radius: 50%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
       .chess-board th {
         padding: .5em;
       }
       .chess-board td {
         width: 3em;
         height: 3em;
+        position: relative;
       }
       .chess-board .light {
         background: #feffdf;
@@ -124,11 +134,17 @@
       var column = position.charAt(0);
       var row = position.charAt(1);
       var color = (column.charCodeAt(0) - 'a'.charCodeAt(0) + parseInt(row)) % 2 === 0 ? 'light' : 'dark';
-      return '<td class="' + color + ' ' + (piece || '') + ' piece" draggable="true" ondragstart="dragStart(event, \'' + position + '\')" ondragover="dragOver(event)" ondrop="drop(event, \'' + position + '\')"></td>';
+      return '<td class="' + color + ' ' + (piece || '') + ' piece" draggable="true" ondragstart="dragStart(event, \'' + position + '\')" ondragover="dragOver(event)" ondrop="drop(event, \'' + position + '\')" data-position="' + position + '"></td>';
     }
 
     // Function to handle drag start
     function dragStart(event, position) {
+      // Clear any existing indicators
+      var existingIndicators = document.querySelectorAll('.indicator');
+      existingIndicators.forEach(function(indicator) {
+        indicator.parentNode.removeChild(indicator);
+      });
+
       event.dataTransfer.setData('text/plain', position);
       
       var img = new Image();
@@ -136,11 +152,29 @@
       event.dataTransfer.setDragImage(img, img.width / 2, img.height / 2);
       
       event.target.style.opacity = '1'; // Change the opacity
+
+      // Calculate possible moves and add a visual indicator to those cells
+      var piece = positions[position];
+      var possibleMoves = calculatePossibleMoves(piece, position);
+      possibleMoves.forEach(function(move) {
+        var cell = document.querySelector('.chess-board td[data-position="' + move + '"]');
+        var div = document.createElement('div');
+        div.className = 'indicator';
+        div.style.width = cell.offsetWidth / 2 + 'px';
+        div.style.height = cell.offsetHeight / 2 + 'px';
+        cell.appendChild(div);
+      });
     }
 
     // Function to handle drag end
     function dragEnd(event) {
       event.target.style.opacity = ''; // Reset the opacity
+
+      // Clear the visual indicators
+      var indicators = document.querySelectorAll('.indicator');
+      indicators.forEach(function(indicator) {
+        indicator.parentNode.removeChild(indicator);
+      });
     }
 
     // Function to handle drag over
@@ -185,6 +219,56 @@
       }
 
       return true;
+    }
+
+    function validateKnightMove(oldPosition, newPosition, piece) {
+      var oldRow = parseInt(oldPosition.charAt(1));
+      var newRow = parseInt(newPosition.charAt(1));
+      var oldColumn = oldPosition.charCodeAt(0);
+      var newColumn = newPosition.charCodeAt(0);
+
+      // Check if the piece is a knight
+      if (piece.includes('knight')) {
+        // Calculate the difference in the row and column positions
+        var rowDifference = Math.abs(newRow - oldRow);
+        var columnDifference = Math.abs(newColumn - oldColumn);
+
+        // Check if the move is valid (L-shape)
+        if (!((rowDifference === 2 && columnDifference === 1) || (rowDifference === 1 && columnDifference === 2))) {
+          return false;
+        }
+
+        // Check if there is a piece in the new position
+        if (positions[newPosition]) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    // Function to calculate possible moves
+    function calculatePossibleMoves(piece, position) {
+      var possibleMoves = [];
+      var columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+      var rows = [1, 2, 3, 4, 5, 6, 7, 8];
+
+      // Iterate over all positions on the board
+      for (var i = 0; i < columns.length; i++) {
+        for (var j = 0; j < rows.length; j++) {
+          var newPosition = columns[i] + rows[j];
+
+          // If the move to the new position is valid, add it to the list of possible moves
+          if (piece.includes('pawn') && validatePawnMove(position, newPosition, piece)) {
+            possibleMoves.push(newPosition);
+          }
+          else if (piece.includes('knight') && validateKnightMove(position, newPosition, piece)) {
+            possibleMoves.push(newPosition);
+          }
+        }
+      }
+
+      return possibleMoves;
     }
 
     // Modify the drop function
