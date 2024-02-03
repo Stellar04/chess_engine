@@ -169,7 +169,12 @@
         var maxMove = oldRow === (piece.startsWith('w') ? 2 : 7) ? 2 : 1;
 
         // Check if the move is valid
-        if (Math.abs(newRow - oldRow) > maxMove || Math.abs(newRow - oldRow) < 1) {
+        if (newRow - oldRow !== direction && newRow - oldRow !== 2 * direction) {
+          return false;
+        }
+
+        // Check if the pawn is moving in the correct direction
+        if ((newRow - oldRow) !== direction && oldRow !== (piece.startsWith('w') ? 2 : 7)) {
           return false;
         }
 
