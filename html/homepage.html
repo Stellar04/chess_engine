@@ -247,6 +247,94 @@
       return true;
     }
 
+    function validateRookMove(oldPosition, newPosition, piece) {
+      var oldRow = parseInt(oldPosition.charAt(1));
+      var newRow = parseInt(newPosition.charAt(1));
+      var oldColumn = oldPosition.charCodeAt(0);
+      var newColumn = newPosition.charCodeAt(0);
+
+      // Check if the piece is a rook
+      if (piece.includes('rook')) {
+        // Rooks can move in straight lines horizontally or vertically
+        if (oldRow !== newRow && oldColumn !== newColumn) {
+          return false;
+        }
+
+        // Check if there is a piece in the new position
+        if (positions[newPosition]) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    function validateBishopMove(oldPosition, newPosition, piece) {
+      var oldRow = parseInt(oldPosition.charAt(1));
+      var newRow = parseInt(newPosition.charAt(1));
+      var oldColumn = oldPosition.charCodeAt(0);
+      var newColumn = newPosition.charCodeAt(0);
+
+      // Check if the piece is a bishop
+      if (piece.includes('bishop')) {
+        // Bishops can move in diagonal lines
+        if (Math.abs(oldRow - newRow) !== Math.abs(oldColumn - newColumn)) {
+          return false;
+        }
+
+        // Check if there is a piece in the new position
+        if (positions[newPosition]) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    function validateQueenMove(oldPosition, newPosition, piece) {
+      var oldRow = parseInt(oldPosition.charAt(1));
+      var newRow = parseInt(newPosition.charAt(1));
+      var oldColumn = oldPosition.charCodeAt(0);
+      var newColumn = newPosition.charCodeAt(0);
+
+      // Check if the piece is a queen
+      if (piece.includes('queen')) {
+        // Queens can move in straight lines horizontally, vertically, or diagonally
+        if (oldRow !== newRow && oldColumn !== newColumn && Math.abs(oldRow - newRow) !== Math.abs(oldColumn - newColumn)) {
+          return false;
+        }
+
+        // Check if there is a piece in the new position
+        if (positions[newPosition]) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    function validateKingMove(oldPosition, newPosition, piece) {
+      var oldRow = parseInt(oldPosition.charAt(1));
+      var newRow = parseInt(newPosition.charAt(1));
+      var oldColumn = oldPosition.charCodeAt(0);
+      var newColumn = newPosition.charCodeAt(0);
+
+      // Check if the piece is a king
+      if (piece.includes('king')) {
+        // Kings can move one square in any direction
+        if (Math.abs(oldRow - newRow) > 1 || Math.abs(oldColumn - newColumn) > 1) {
+          return false;
+        }
+
+        // Check if there is a piece in the new position
+        if (positions[newPosition]) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
     // Function to calculate possible moves
     function calculatePossibleMoves(piece, position) {
       var possibleMoves = [];
@@ -263,6 +351,18 @@
             possibleMoves.push(newPosition);
           }
           else if (piece.includes('knight') && validateKnightMove(position, newPosition, piece)) {
+            possibleMoves.push(newPosition);
+          }
+          else if (piece.includes('rook') && validateRookMove(position, newPosition, piece)) {
+            possibleMoves.push(newPosition);
+          }
+          else if (piece.includes('bishop') && validateBishopMove(position, newPosition, piece)) {
+            possibleMoves.push(newPosition);
+          }
+          else if (piece.includes('queen') && validateQueenMove(position, newPosition, piece)) {
+            possibleMoves.push(newPosition);
+          }
+          else if (piece.includes('king') && validateKingMove(position, newPosition, piece)) {
             possibleMoves.push(newPosition);
           }
         }
