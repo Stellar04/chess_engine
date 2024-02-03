@@ -14,6 +14,18 @@
         align-items: center;
         height: 100vh; /* This makes sure the body takes the full viewport height */
         margin: 0; /* This removes any default margin */
+        overflow: hidden;
+      }
+
+      .scrollable-div {
+        height: 100%; 
+        overflow-y: auto;
+      }
+
+      .scrollable-div span {
+        display: block;
+        max-height: 90%;
+        overflow-y: auto;
       }
 
       .indicator {
@@ -23,6 +35,20 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+      }
+
+      .chess-title {
+        position: absolute;
+        top: 0;
+        left: 10px;
+        margin-top: 10px;
+      }
+
+      .chess-debug {
+        position: absolute;
+        top: 0;
+        left: 10px;
+        margin-top: 50px;
       }
 
       .chess-board th {
@@ -87,6 +113,10 @@
     </style>
   </head>
   <body>
+    <h1 class="chess-title">Chess</h1>
+    <div class="scrollable-div">
+      <span class="chess-debug">Debug</span>
+    </div>
     <table class="chess-board">
       <tbody>
       </tbody>
@@ -128,6 +158,15 @@
       'g8': 'b_knight',
       'h8': 'b_rook',
     };
+
+    // Display the positions in a formatted string
+    function displayPositionsDebug() {
+      var positionsStr = JSON.stringify(positions, null, 2); // convert object to formatted string
+      positionsStr = positionsStr.replace(/,/g, ',<br>'); // replace , with ,<br>
+      document.querySelector('.chess-debug').innerHTML = positionsStr; // set the HTML content
+    }
+
+    displayPositionsDebug(); // Call the function to display the positions
 
     // Function to generate HTML for a cell
     function generateCell(position, piece) {
@@ -371,19 +410,31 @@
       return possibleMoves;
     }
 
-    // Modify the drop function
     function drop(event, newPosition) {
       event.preventDefault();
       var oldPosition = event.dataTransfer.getData('text/plain');
       var piece = positions[oldPosition];
 
-      // Validate the move
-      if (!validatePawnMove(oldPosition, newPosition, piece)) {
-        return;
+      // Extract the piece type from the piece name
+      var pieceType = piece.substring(2);
+
+      // Check what piece is being dropped
+      if (pieceType === 'pawn') {
+        // Validate the move for pawn
+        if (!validatePawnMove(oldPosition, newPosition, piece)) {
+          return;
+        }
+      } else if (pieceType === 'rook') {
+        //Validate the move for rook
+        if (!validateRookMove(oldPosition, newPosition, piece)) {
+          return;
+        }
       }
+      // Add more else if conditions for other pieces like knight, bishop, queen, king
 
       delete positions[oldPosition];
       positions[newPosition] = piece;
+      displayPositionsDebug(); // Call the function to display the positions
       generateBoard();
     }
 
