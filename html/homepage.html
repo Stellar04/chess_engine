@@ -58,7 +58,7 @@
         top: 0;
         left: 10px;
         margin-top: 50px;
-      }
+      }     
 
       .chess-board th {
         padding: .5em;
@@ -294,7 +294,7 @@
       var newRow = parseInt(newPosition.charAt(1));
       var oldColumn = oldPosition.charCodeAt(0);
       var newColumn = newPosition.charCodeAt(0);
-
+      
       // Check if the piece is a knight
       if (piece.includes('knight')) {
         // Calculate the difference in the row and column positions
@@ -453,13 +453,32 @@
         if (!validatePawnMove(oldPosition, newPosition, piece)) {
           return;
         }
+      } else if (pieceType === 'knight') {
+        //Validate the move for knight
+        if (!validateKnightMove(oldPosition, newPosition, piece)) {
+          return;
+        }
       } else if (pieceType === 'rook') {
         //Validate the move for rook
         if (!validateRookMove(oldPosition, newPosition, piece)) {
           return;
         }
+      } else if (pieceType === 'bishop') {
+        //Validate the move for bishop
+        if (!validateBishopMove(oldPosition, newPosition, piece)) {
+          return;
+        }
+      } else if (pieceType === 'queen') {
+        //Validate the move for queen
+        if (!validateQueenMove(oldPosition, newPosition, piece)) {
+          return;
+        }
+      } else if (pieceType === 'king') {
+        //Validate the move for king
+        if (!validateKingMove(oldPosition, newPosition, piece)) {
+          return;
+        }
       }
-      // Add more else if conditions for other pieces like knight, bishop, queen, king
 
       delete positions[oldPosition];
       positions[newPosition] = piece;
